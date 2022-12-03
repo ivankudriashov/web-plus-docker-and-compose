@@ -1,37 +1,35 @@
-version: "3.9"
-services:
-  frontend:
-    build: ./frontend
-    image: "nestjs"
-    ports:
-      - "8081:80"
-    tty: true
-    stdin_open: true
-    depends_on:
-      - backend
+version: '3'
 
-  backend:
-    build: ./backend
-    image: "nestjs-app"
-    env_file:
-      - ./.env
+services:
+  api:
+    container_name: "kpd-backend"
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    env_file: .env
+    restart: always
     ports:
-      - "4000:3000"
-    restart: on-failure 
+      - 4000:3000
     depends_on:
       - postgres
 
   postgres:
-    image: postgres:13
-    env_file:
-      - ./.env
-    ports:
-      - "5433:5432"
+    container_name: "kpd-database"
+    image: postgres:12.12-alpine
+    restart: always
+    env_file: .env
     environment:
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-    # монтируем директорию ./pg-data основной ОС в директорию с данными в контейнере
-     - pgdata:/var/lib/postgresql/data/pgdata
+      - pgdata:/var/lib/postgresql/data/pgdata
+
+  frontend:
+    container_name: "kpd-frontend-nginx"
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    ports:
+      - 8081:80
 
 volumes:
   pgdata:
