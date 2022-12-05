@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { User } from '../users/entities/user.entity';
@@ -19,6 +19,10 @@ export class AuthService {
 
   async validatePassword(username: string, password: string) {
     const user = await this.usersService.findByUsername(username);
+
+    if (!user) {
+      throw new UnauthorizedException('Неверная почта или пароль');
+    }
 
     const matched = await bcrypt.compare(password, user.password);
 

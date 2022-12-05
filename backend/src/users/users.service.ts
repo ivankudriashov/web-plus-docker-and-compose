@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -21,7 +25,16 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const { password } = createUserDto;
+    const { password, email } = createUserDto;
+
+    const userByEmail = await this.userRepository.findBy({
+      email: email,
+    });
+
+    if (userByEmail) {
+      throw new ConflictException('Пользователь с такой почтой уже существует');
+    }
+
     const user = await this.userRepository.create({
       ...createUserDto,
       password: await hashPassword(password),
@@ -41,7 +54,13 @@ export class UsersService {
   }
 
   async findOne(id: number): Promise<User> {
-    return this.userRepository.findOneBy({ id });
+    const user = this.userRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new BadRequestException('Пользователь с таким id не найден');
+    }
+
+    return user;
   }
 
   async findUserWishes(username: string): Promise<UserWishesDto[]> {
@@ -65,7 +84,12 @@ export class UsersService {
   }
 
   async update(id: number, user: UpdateUserDto) {
-    const { password } = user;
+    const { password, email } = user;
+
+    if (email) {
+      throw new ConflictException('Пользователь с такой почтой уже существует');
+    }
+
     if (password) {
       return this.userRepository.update(id, {
         ...user,
