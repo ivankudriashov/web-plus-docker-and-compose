@@ -31,7 +31,7 @@ export class UsersService {
       email: email,
     });
 
-    if (userByEmail.length) {
+    if (userByEmail.length !== 0) {
       throw new ConflictException('Пользователь с такой почтой уже существует');
     }
 
@@ -86,7 +86,11 @@ export class UsersService {
   async update(id: number, user: UpdateUserDto) {
     const { password, email } = user;
 
-    if (email) {
+    const userByEmail = await this.userRepository.findBy({
+      email: email,
+    });
+
+    if (userByEmail.length !== 0) {
       throw new ConflictException('Пользователь с такой почтой уже существует');
     }
 

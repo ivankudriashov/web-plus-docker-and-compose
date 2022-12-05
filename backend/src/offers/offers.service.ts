@@ -100,7 +100,7 @@ export class OffersService {
       relations: ['user'],
     });
     if (offer.user.id !== userId) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('');
     }
     return {
       ...offer,

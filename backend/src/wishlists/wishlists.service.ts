@@ -90,7 +90,7 @@ export class WishlistsService {
       relations: ['owner'],
     });
     if (wishlist && wishlist.owner.id !== userId) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('');
     }
     const wishes = await this.wishesRepository.findBy({
       id: In(updateWishlistDto.itemsId),

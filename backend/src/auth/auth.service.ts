@@ -21,7 +21,7 @@ export class AuthService {
     const user = await this.usersService.findByUsername(username);
 
     if (!user) {
-      throw new UnauthorizedException('Неверная почта или пароль');
+      throw new UnauthorizedException('Неверный логин или пароль');
     }
 
     const matched = await bcrypt.compare(password, user.password);
