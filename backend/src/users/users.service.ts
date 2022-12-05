@@ -31,7 +31,7 @@ export class UsersService {
       email: email,
     });
 
-    if (userByEmail) {
+    if (userByEmail.length) {
       throw new ConflictException('Пользователь с такой почтой уже существует');
     }
 
