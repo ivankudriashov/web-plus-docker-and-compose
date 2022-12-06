@@ -86,12 +86,22 @@ export class UsersService {
   async update(id: number, user: UpdateUserDto) {
     const { password, email } = user;
 
-    const userByEmail = await this.userRepository.findBy({
-      email: email,
-    });
+    if (email) {
+      const userByEmail = await this.userRepository.findBy({
+        email: email,
+      });
 
-    if (userByEmail.length !== 0) {
-      throw new ConflictException('Пользователь с такой почтой уже существует');
+      const userById = await this.userRepository.findBy({
+        id: id,
+      });
+
+      if (userByEmail.length !== 0) {
+        if (userById[0].email !== email) {
+          throw new ConflictException(
+            'Пользователь с такой почтой уже существует1',
+          );
+        }
+      }
     }
 
     if (password) {
